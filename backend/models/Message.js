@@ -7,8 +7,10 @@ const messageSchema = new mongoose.Schema({
   avatar: { type: String },
   text: { type: String },
   fileUrl: { type: String },
-  fileType: { type: String }, // 'image', 'video', or 'raw'
-  seen: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Array of user IDs
+  fileType: { type: String },
+  fileName: { type: String },
+  fileSize: { type: Number },
+  seen: [{ type: String }],
 }, { timestamps: true });
 
 export default mongoose.model("Message", messageSchema);

@@ -9,6 +9,7 @@ export const useChatStore = create((set, get) => ({
   messages: [],
   socket: null,
   isLoadingMessages: false,
+  isSendingMessage: false,
 
   getMessages: async (roomId) => {
     if (!roomId) return;
@@ -53,27 +54,39 @@ export const useChatStore = create((set, get) => ({
     set({ socket });
   },
 
-  sendTextMessage: async (roomId, text, image = null) => {
+  sendTextMessage: async (roomId, text, attachment = null) => {
     const { currentUser } = useAuthStore.getState();
     const { socket } = get();
 
     if (!currentUser || !socket || !roomId) return;
 
-    let fileUrl = null;
-    if (image) {
-      const res = await axiosInstance.post("/messages/upload", { file: image });
-      fileUrl = res.data.url;
-    }
+    set({ isSendingMessage: true });
 
-    socket.emit("sendMessage", {
-      roomId,
-      userId: currentUser._id,
-      username: currentUser.username,
-      avatar: currentUser.avatar,
-      text,
-      fileUrl,
-      fileType: image ? "image" : null,
-    });
+    try {
+      let uploadedFile = null;
+      if (attachment) {
+        const res = await axiosInstance.post("/messages/upload", {
+          file: attachment.base64,
+          name: attachment.name,
+          size: attachment.size,
+        });
+        uploadedFile = res.data;
+      }
+
+      socket.emit("sendMessage", {
+        roomId,
+        userId: currentUser._id,
+        username: currentUser.username,
+        avatar: currentUser.avatar,
+        text,
+        fileUrl: uploadedFile?.url || null,
+        fileType: uploadedFile?.fileType || null,
+        fileName: uploadedFile?.fileName || null,
+        fileSize: uploadedFile?.fileSize || null,
+      });
+    } finally {
+      set({ isSendingMessage: false });
+    }
   },
 
   disconnectSocket: () => {
