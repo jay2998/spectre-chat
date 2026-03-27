@@ -127,18 +127,30 @@ const ChatRoom = () => {
                   )}
 
                   {message.fileUrl && message.fileType !== "image" && (
-                    <a
-                      href={message.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mb-2 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/10 px-3 py-2 text-sm"
-                    >
+                    <div className="mb-2 rounded-xl border border-white/10 bg-black/10 px-3 py-2 text-sm">
                       <div>
                         <p className="font-medium">{message.fileName || "Attachment"}</p>
                         <p className="text-xs text-white/70">{formatFileSize(message.fileSize) || "Open file"}</p>
                       </div>
-                      <span className="text-xs uppercase tracking-wide text-white/70">Open</span>
-                    </a>
+                      <div className="mt-3 flex gap-2">
+                        <a
+                          href={message.fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-lg bg-white/10 px-3 py-1 text-xs uppercase tracking-wide text-white/80"
+                        >
+                          Open
+                        </a>
+                        <a
+                          href={message.downloadUrl || message.fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-lg bg-white/10 px-3 py-1 text-xs uppercase tracking-wide text-white/80"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    </div>
                   )}
 
                   {message.text && <p className="whitespace-pre-wrap">{message.text}</p>}

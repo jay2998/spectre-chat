@@ -80,6 +80,7 @@ export const useChatStore = create((set, get) => ({
         avatar: currentUser.avatar,
         text,
         fileUrl: uploadedFile?.url || null,
+        downloadUrl: uploadedFile?.downloadUrl || null,
         fileType: uploadedFile?.fileType || null,
         fileName: uploadedFile?.fileName || null,
         fileSize: uploadedFile?.fileSize || null,

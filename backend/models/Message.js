@@ -7,6 +7,7 @@ const messageSchema = new mongoose.Schema({
   avatar: { type: String },
   text: { type: String },
   fileUrl: { type: String },
+  downloadUrl: { type: String },
   fileType: { type: String },
   fileName: { type: String },
   fileSize: { type: Number },

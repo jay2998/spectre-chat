@@ -9,6 +9,9 @@ export const uploadFile = async (req, res) => {
     const uploadResponse = await cloudinary.uploader.upload(file, {
       folder: "chat_app_uploads",
       resource_type: "auto",
+      use_filename: true,
+      unique_filename: true,
+      filename_override: name || undefined,
     });
 
     const fileType =
@@ -18,8 +21,27 @@ export const uploadFile = async (req, res) => {
           ? "video"
           : "file";
 
+    const fileUrl =
+      fileType === "file"
+        ? cloudinary.url(uploadResponse.public_id, {
+            resource_type: uploadResponse.resource_type,
+            type: "upload",
+            secure: true,
+            format: uploadResponse.format,
+          })
+        : uploadResponse.secure_url;
+
+    const downloadUrl = cloudinary.url(uploadResponse.public_id, {
+      resource_type: uploadResponse.resource_type,
+      type: "upload",
+      secure: true,
+      format: uploadResponse.format,
+      flags: "attachment",
+    });
+
     res.status(200).json({
-      url: uploadResponse.secure_url,
+      url: fileUrl,
+      downloadUrl,
       fileType,
       fileName: name || uploadResponse.original_filename,
       fileSize: size || uploadResponse.bytes,
@@ -42,7 +64,7 @@ export const getMessages = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
   try {
-    const { text, fileUrl, fileType, fileName, fileSize, roomId, username, avatar } = req.body;
+    const { text, fileUrl, downloadUrl, fileType, fileName, fileSize, roomId, username, avatar } = req.body;
     const newMessage = new Message({
       roomId,
       userId: req.userId,
@@ -50,6 +72,7 @@ export const sendMessage = async (req, res) => {
       avatar,
       text,
       fileUrl,
+      downloadUrl,
       fileType,
       fileName,
       fileSize,
