@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { axiosInstance } from '../api/axiosInstance'
+import { axiosInstance } from '../lib/axiosInstance'
 import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
 
@@ -18,7 +18,7 @@ const Login = () => {
     try {
       const res = await axiosInstance.post('/auth/login', form)
       setCurrentUser(res.data)
-      toast.success(`Welcome, ${res.data.username}!`)
+      toast.success(`Welcome back, ${res.data.username}!`)
       navigate('/')
     } catch (err) {
       toast.error(err.response?.data || 'Login failed')
@@ -34,17 +34,16 @@ const Login = () => {
         <p className="text-sm text-gray-400 mb-6">Sign in to continue</p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input name="username" placeholder="Username" onChange={handleChange}
-            className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500 transition placeholder-gray-500" required />
+            className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500 transition" required />
           <input name="password" type="password" placeholder="Password" onChange={handleChange}
-            className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500 transition placeholder-gray-500" required />
+            className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm outline-none focus:border-indigo-500 transition" required />
           <button type="submit" disabled={loading}
             className="bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition disabled:opacity-60">
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
         <p className="text-sm text-center text-gray-500 mt-6">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-indigo-400 hover:underline">Register</Link>
+          New user? <Link to="/register" className="text-indigo-400 hover:underline">Register</Link>
         </p>
       </div>
     </div>

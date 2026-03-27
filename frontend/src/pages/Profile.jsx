@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { axiosInstance } from "../api/axiosInstance";
+import { axiosInstance } from "../lib/axiosInstance";
 import { useAuthStore } from "../store/authStore";
 import toast from "react-hot-toast";
 
@@ -39,12 +39,11 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      const res = await axiosInstance.put("/auth/profile", { avatar, bio });
+      const res = await axiosInstance.put("/auth/profile", { bio, avatar });
       setCurrentUser(res.data);
-      toast.success("Profile updated!");
-      navigate("/");
+      toast.success("Profile Updated!");
     } catch (err) {
-      toast.error("Failed to update profile");
+      toast.error("Save failed");
     }
   };
 

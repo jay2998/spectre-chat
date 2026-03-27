@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { axiosInstance } from '../api/axiosInstance'
+import { axiosInstance } from '../lib/axiosInstance'
 import toast from 'react-hot-toast'
 
 const Register = () => {

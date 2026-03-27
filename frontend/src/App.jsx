@@ -1,28 +1,36 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Home from './pages/Home'
-import ChatRoom from './pages/ChatRoom'
-import Profile from './pages/Profile'
-import ProtectedRoute from './components/ProtectedRoute'
+import { useEffect } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import ChatRoom from "./pages/ChatRoom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import Register from "./pages/Register";
+import { useAuthStore } from "./store/authStore";
 
-function App() {
+const App = () => {
+  const { currentUser, checkAuth, isCheckingAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  if (isCheckingAuth && !currentUser) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-950 text-white">
+        <p>Loading session...</p>
+      </div>
+    );
+  }
+
   return (
-    <BrowserRouter>
-      <Toaster position="top-right" />
-      <Routes>
-        <Route path="/login"    element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        <Route path="/room/:id" element={<ProtectedRoute><ChatRoom /></ProtectedRoute>} />
-        <Route path="/profile"  element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="*"         element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
-  )
-}
+    <Routes>
+      <Route path="/" element={currentUser ? <Home /> : <Navigate to="/login" />} />
+      <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/" />} />
+      <Route path="/register" element={!currentUser ? <Register /> : <Navigate to="/" />} />
+      <Route path="/profile" element={currentUser ? <Profile /> : <Navigate to="/login" />} />
+      <Route path="/chat/:id" element={currentUser ? <ChatRoom /> : <Navigate to="/login" />} />
+    </Routes>
+  );
+};
 
-export default App
-
-
+export default App;

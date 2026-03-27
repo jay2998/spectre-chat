@@ -1,10 +1,15 @@
-import express from 'express'
-import { getMessages, uploadFile } from '../controllers/messageController.js'
-import { verifyToken } from '../middleware/verifyToken.js'
+import express from 'express';
+import { getMessages, uploadFile, sendMessage } from '../controllers/messageController.js';
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/:roomId',  getMessages)
-router.post('/upload',  verifyToken, uploadFile)
+// GET history
+router.get('/:roomId', getMessages);
 
-export default router
+// POST upload (Cloudinary)
+router.post('/upload', uploadFile);
+
+// POST send (Database)
+router.post('/send', sendMessage);
+
+export default router;
