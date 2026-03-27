@@ -16,10 +16,22 @@ export const checkAuth = async (req, res) => {
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json("Username, email, and password are required.");
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json("Password must be at least 6 characters.");
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = new User({ username, email, password: hashedPassword });
+    const user = new User({
+      username: username.trim(),
+      email: email.trim().toLowerCase(),
+      password: hashedPassword,
+    });
     await user.save();
     res.status(201).json("User created.");
   } catch (err) {
@@ -30,10 +42,17 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.body.username });
+    const username = req.body.username?.trim();
+    const password = req.body.password;
+
+    if (!username || !password) {
+      return res.status(400).json("Username and password are required.");
+    }
+
+    const user = await User.findOne({ username });
     if (!user) return res.status(404).json("User not found.");
 
-    const match = await bcrypt.compare(req.body.password, user.password);
+    const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json("Wrong password.");
 
     const token = jwt.sign(
@@ -45,7 +64,7 @@ export const login = async (req, res) => {
     await User.findByIdAndUpdate(user._id, { isOnline: true });
 
     const isProduction = process.env.NODE_ENV === "production";
-    const { password, ...info } = user._doc;
+    const { password: _password, ...info } = user._doc;
     res.cookie("accessToken", token, {
         httpOnly: true,
         secure: isProduction,
@@ -72,6 +91,36 @@ export const logout = async (req, res) => {
     }).status(200).json("Logged out.");
   } catch (err) {
     res.status(500).json("Logout failed.");
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json("Email and new password are required.");
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json("Password must be at least 6 characters.");
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(404).json("No account found with that email.");
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+
+    res.status(200).json("Password reset successfully. Please log in.");
+  } catch (err) {
+    res.status(500).json("Password reset failed.");
   }
 };
 

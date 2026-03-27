@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { axiosInstance } from "../lib/axiosInstance";
 import { useAuthStore } from "./authStore";
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
+const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL || "http://localhost:5000").trim();
 
 export const useChatStore = create((set, get) => ({
   messages: [],

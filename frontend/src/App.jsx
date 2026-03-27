@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
 import { useAuthStore } from "./store/authStore";
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
       <Route path="/" element={currentUser ? <Home /> : <Navigate to="/login" />} />
       <Route path="/login" element={!currentUser ? <Login /> : <Navigate to="/" />} />
       <Route path="/register" element={!currentUser ? <Register /> : <Navigate to="/" />} />
+      <Route path="/reset-password" element={!currentUser ? <ResetPassword /> : <Navigate to="/" />} />
       <Route path="/profile" element={currentUser ? <Profile /> : <Navigate to="/login" />} />
       <Route path="/chat/:id" element={currentUser ? <ChatRoom /> : <Navigate to="/login" />} />
     </Routes>
